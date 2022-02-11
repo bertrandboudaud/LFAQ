@@ -81,19 +81,27 @@ parser.add_argument('--RegressionMethod',
 parser.add_argument('--alpha',
                     type=float,
                     default=0.85,
-                    help='The base parameter for the tree prior, ranging from 0 to 1.')
+                    help='(BART parameter) The base parameter for the tree prior, ranging from 0 to 1.')
 parser.add_argument('--beta',
                     type=float,
                     default=1.6,
-                    help='The power parameter for the tree prior, ranging from 0 to positive infinite.')
+                    help='(BART parameter) The power parameter for the tree prior, ranging from 0 to positive infinite.')
 parser.add_argument('--k',
                     type=int,
                     default=2,
-                    help='The number of standard deviations of the dependent variables in the training set.')
+                    help='(BART parameter) The number of standard deviations of the dependent variables in the training set.')
 parser.add_argument('--Number_of_trees',
                     type=int,
                     default=200,
-                    help='The number of trees to train in the BART.')
+                    help='(BART parameter) The number of trees to train in the BART.')
+parser.add_argument('--alpha1',
+                    type=float,
+                    default=0.95,
+                    help='(stepwise parameter) The alpha1 should be a numerical number between 0 and 1.')
+parser.add_argument('--alpha2',
+                    type=float,
+                    default=0.95,
+                    help='(stepwise parameter) The alpha2 should be a numerical number between 0 and 1.')
 parser.add_argument('--MaxMissedCleavage',
                     type=int,
                     default=0,
