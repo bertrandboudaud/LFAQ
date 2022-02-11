@@ -30,7 +30,7 @@ parser.add_argument('ResultPath', type=pathlib.Path,
 
 # optional arguments
 parser.add_argument('--IdentificationFileType', type=ascii,
-                    choices=["maxquant", "TODO1", "TODO2"],
+                    choices=["maxquant", "PeakView", "mzQuantML"],
                     default="maxquant",
                     help='Software used to identify the proteins')
 parser.add_argument('--IdentifierParsingRule', type=ascii,
@@ -51,7 +51,7 @@ parser.add_argument('--IfCalculateiBAQ', action='store_false',
 parser.add_argument('--IfCalculateTop3', action='store_false',
                     help='Calculate Top 3')
 parser.add_argument('--RegressionMethod', type=ascii,
-                    choices=["BART", "TODO1", "TODO2"],
+                    choices=["BART", "stepwise"],
                     default="BART",
                     help='Regression method for Q-factor learning.')
 parser.add_argument('--alpha', type=float,
