@@ -27,6 +27,8 @@ parser.add_argument('Fastapath', type=pathlib.Path,
                     help='The file path of proteins database (*.fasta)')
 parser.add_argument('ResultPath', type=pathlib.Path,
                     help='Result directory')
+parser.add_argument('ExecutablesPath', type=pathlib.Path,
+                    help='LFAQ Executables path')
 
 # optional arguments
 parser.add_argument('--IdentificationFileType', type=ascii,
@@ -83,9 +85,9 @@ parser.add_argument('--IfCotainStandardProtein', action='store_false',
 parser.add_argument('--IdentifierOfStandardProtein', type=ascii,
                     default="ups",
                     help='If the sample contains proteins, identifier of standard proteins')
-parser.add_argument('StandardProteinsFilePath', type=pathlib.Path,
-                    help='Standard proteins file path. It will be set by the workflow internally, but you can override it.')
-
+parser.add_argument('--StandardProteinsFilePath', type=pathlib.Path,
+                    default="",
+                    help='Standard proteins file path.')
 args = parser.parse_args()
 
 # summary message
@@ -113,7 +115,7 @@ parameter_file.close()
 print("Parameters file created at {0}".format(parameter_full_path))
 
 # execute workflow
-executables_path = "C:\\Users\\bertr\\LFAQ\\ExecutableFiles\\x64\\"
+executables_path = args.ExecutablesPath
 os.chdir(executables_path)
 
 # launch load.exe
