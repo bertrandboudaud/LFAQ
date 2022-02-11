@@ -18,6 +18,9 @@ import os
 import datetime
 import subprocess
 
+# example of use:
+# lfaq.py "C:\\Users\\bertr\\LFAQ\\TestData\\MaxQuantTestData" "C:\\Users\\bertr\\LFAQ\\TestData\\MaxQuantTestData\\UPS_YEAST_uniprot_sp_Release201311.fasta" "C:\\Users\\bertr\\LFAQ\\result_dir"  "C:\\Users\\bertr\\LFAQ\\ExecutableFiles\\x64\\" --Number_of_trees 42 --alpha 0.5 --beta 1.5
+
 parser = argparse.ArgumentParser(description='LFAQ, a novel algorithm for label-free absolute protein quantification, which can correct the biased MS intensities using the predicted peptide quantitative factors for all identified peptides.',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -107,6 +110,7 @@ parser.add_argument('--StandardProteinsFilePath',
                     type=pathlib.Path,
                     default="",
                     help='Standard proteins file path.')
+
 # args for BART regression methods
 bart_group = parser.add_argument_group('BART regression methods arguments')
 bart_group.add_argument('--alpha',
@@ -125,6 +129,7 @@ bart_group.add_argument('--Number_of_trees',
                     type=int,
                     default=200,
                     help='The number of trees to train in the BART.')
+
 # args for stepwise regression methods
 stepwise_group = parser.add_argument_group('stepwise regression methods arguments')
 stepwise_group.add_argument('--alpha1',
@@ -135,6 +140,7 @@ stepwise_group.add_argument('--alpha2',
                     type=float,
                     default=0.95,
                     help='The alpha2 should be a numerical number between 0 and 1.')
+
 args = parser.parse_args()
 
 # summary message
@@ -153,8 +159,6 @@ for arg in vars(args):
         else: # "PeakView", "mzQuantML"
             parameter_name = "Input file path"
     value = getattr(args,arg)
-    if arg == "IdentifierParsingRule":
-        value = value.replace("\\\\","\\")
     parameter_file.write("{0}=\"{1}\"\n".format(parameter_name,value))
     print("{0}=\"{1}\"".format(parameter_name,value))
 parameter_file.close()
