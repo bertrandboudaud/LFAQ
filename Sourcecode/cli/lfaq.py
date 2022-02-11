@@ -95,15 +95,17 @@ parameter_file_name =  "parameters_" + str(datetime.datetime.now()).replace(" ",
 full_path = os.path.join(args.ResultPath, parameter_file_name)
 parameter_file = open(full_path, 'w')
 for arg in vars(args):
-    parameter_name = arg.replace("_", " ").replace("'","")
+    parameter_name = arg.replace("_", " ")
     value = getattr(args,arg)
     if isinstance(value, bool):
         if value:
             value="true"
         else:
             value="false"
-    parameter_file.write("{0}=\"{1}\"\n".format(arg,value))
-    print("{0}=\"{1}\"".format(arg,value))
+    if isinstance(value, str):
+        value = value.replace("'","")
+    parameter_file.write("{0}=\"{1}\"\n".format(parameter_name,value))
+    print("{0}=\"{1}\"".format(parameter_name,value))
 parameter_file.close()
 print("Parameters file created at {0}".format(full_path))
 
