@@ -22,9 +22,9 @@ parser = argparse.ArgumentParser(description='LFAQ, a novel algorithm for label-
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # Required arguments
-parser.add_argument('Input_directory_path',
+parser.add_argument('Input',
                     type=pathlib.Path,
-                    help='Input data directory')
+                    help='Input data directory for maxquant type, .mzq file for mzQuantML type or .csv file for PeakView/SWATH 2.0 type')
 parser.add_argument('Fastapath',
                     type=pathlib.Path,
                     help='The file path of proteins database (*.fasta)')
@@ -78,30 +78,6 @@ parser.add_argument('--RegressionMethod',
                     choices=['BART', 'stepwise'],
                     default="BART",
                     help='Regression method for Q-factor learning.')
-parser.add_argument('--alpha',
-                    type=float,
-                    default=0.85,
-                    help='(BART parameter) The base parameter for the tree prior, ranging from 0 to 1.')
-parser.add_argument('--beta',
-                    type=float,
-                    default=1.6,
-                    help='(BART parameter) The power parameter for the tree prior, ranging from 0 to positive infinite.')
-parser.add_argument('--k',
-                    type=int,
-                    default=2,
-                    help='(BART parameter) The number of standard deviations of the dependent variables in the training set.')
-parser.add_argument('--Number_of_trees',
-                    type=int,
-                    default=200,
-                    help='(BART parameter) The number of trees to train in the BART.')
-parser.add_argument('--alpha1',
-                    type=float,
-                    default=0.95,
-                    help='(stepwise parameter) The alpha1 should be a numerical number between 0 and 1.')
-parser.add_argument('--alpha2',
-                    type=float,
-                    default=0.95,
-                    help='(stepwise parameter) The alpha2 should be a numerical number between 0 and 1.')
 parser.add_argument('--MaxMissedCleavage',
                     type=int,
                     default=0,
@@ -131,6 +107,34 @@ parser.add_argument('--StandardProteinsFilePath',
                     type=pathlib.Path,
                     default="",
                     help='Standard proteins file path.')
+# args for BART regression methods
+bart_group = parser.add_argument_group('BART regression methods arguments')
+bart_group.add_argument('--alpha',
+                    type=float,
+                    default=0.85,
+                    help='The base parameter for the tree prior, ranging from 0 to 1.')
+bart_group.add_argument('--beta',
+                    type=float,
+                    default=1.6,
+                    help='The power parameter for the tree prior, ranging from 0 to positive infinite.')
+bart_group.add_argument('--k',
+                    type=int,
+                    default=2,
+                    help='The number of standard deviations of the dependent variables in the training set.')
+bart_group.add_argument('--Number_of_trees',
+                    type=int,
+                    default=200,
+                    help='The number of trees to train in the BART.')
+# args for stepwise regression methods
+stepwise_group = parser.add_argument_group('stepwise regression methods arguments')
+stepwise_group.add_argument('--alpha1',
+                    type=float,
+                    default=0.95,
+                    help='The alpha1 should be a numerical number between 0 and 1.')
+stepwise_group.add_argument('--alpha2',
+                    type=float,
+                    default=0.95,
+                    help='The alpha2 should be a numerical number between 0 and 1.')
 args = parser.parse_args()
 
 # summary message
@@ -143,6 +147,11 @@ parameter_full_path = os.path.join(args.ResultPath, parameter_file_name)
 parameter_file = open(parameter_full_path, 'w')
 for arg in vars(args):
     parameter_name = arg.replace("_", " ")
+    if parameter_name == "Input":
+        if args.IdentificationFileType == "maxquant":
+            parameter_name = "Input directory path"
+        else: # "PeakView", "mzQuantML"
+            parameter_name = "Input file path"
     value = getattr(args,arg)
     if arg == "IdentifierParsingRule":
         value = value.replace("\\\\","\\")
