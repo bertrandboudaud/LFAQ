@@ -1,4 +1,4 @@
-#  Copyright(C) 2015-2018  all rights reserved
+#  Copyright(C) 2015-2022  all rights reserved
 #  This program is a free software; you can redistribute it and / or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
@@ -14,8 +14,10 @@
 
 import argparse
 import pathlib
+import os
+import datetime
 
-parser = argparse.ArgumentParser(description='Optional app description')
+parser = argparse.ArgumentParser(description='LFAQ, a novel algorithm for label-free absolute protein quantification, which can correct the biased MS intensities using the predicted peptide quantitative factors for all identified peptides.')
 
 # Required arguments
 parser.add_argument('Input_directory_path', type=pathlib.Path,
@@ -27,7 +29,8 @@ parser.add_argument('ResultPath', type=pathlib.Path,
 
 # optional arguments
 parser.add_argument('--IdentificationFileType', type=ascii,
-                    choices=['maxquant', 'TODO1', 'TODO2'],
+                    choices=["maxquant", "TODO1", "TODO2"],
+                    default="maxquant",
                     help='')
 parser.add_argument('--IdentifierParsingRule', type=ascii,
                     default=">(.*?)\\s",
@@ -47,7 +50,8 @@ parser.add_argument('--IfCalculateiBAQ', action='store_false',
 parser.add_argument('--IfCalculateTop3', action='store_false',
                     help='')
 parser.add_argument('--RegressionMethod', type=ascii,
-                    choices=['BART', 'TODO1', 'TODO2'],
+                    choices=["BART", "TODO1", "TODO2"],
+                    default="BART",
                     help='')
 parser.add_argument('--alpha', type=float,
                     default=0.85,
@@ -82,3 +86,25 @@ parser.add_argument('StandardProteinsFilePath', type=pathlib.Path,
                     help='')
 
 args = parser.parse_args()
+
+# summary message
+print("Running LFAQ with the following parameters:")
+
+# create parameter file
+parameter_file_name =  "parameters_" + str(datetime.datetime.now()).replace(" ","_").replace(":","").replace("-","").replace(".","_") + ".params"
+full_path = os.path.join(args.ResultPath, parameter_file_name)
+parameter_file = open(full_path, 'w')
+for arg in vars(args):
+    parameter_name = arg.replace("_", " ").replace("'","")
+    value = getattr(args,arg)
+    if isinstance(value, bool):
+        if value:
+            value="true"
+        else:
+            value="false"
+    parameter_file.write("{0}=\"{1}\"\n".format(arg,value))
+    print("{0}=\"{1}\"".format(arg,value))
+parameter_file.close()
+print("Parameters file created at {0}".format(full_path))
+
+# launch
