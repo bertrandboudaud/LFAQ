@@ -37,12 +37,12 @@ parser.add_argument('ExecutablesPath',
 
 # optional arguments
 parser.add_argument('--IdentificationFileType',
-                    type=ascii,
-                    choices=["maxquant", "PeakView", "mzQuantML"],
+                    type=str,
+                    choices=['maxquant', 'PeakView', 'mzQuantML'],
                     default="maxquant",
                     help='Software used to identify the proteins')
 parser.add_argument('--IdentifierParsingRule',
-                    type=ascii,
+                    type=str,
                     default='>(.*?)\s',
                     help='The regular expression used to extract protein identifiers from the fasta file.')
 parser.add_argument('--IfExistDecoyProteins',
@@ -51,7 +51,7 @@ parser.add_argument('--IfExistDecoyProteins',
                     choices=('true','false'),
                     help='Set to true if input protein list contains decoy proteins')
 parser.add_argument('--PrefixOfDecoyProtein',
-                    type=ascii,
+                    type=str,
                     default="REV_",
                     help='Prefix of decoy proteins')
 parser.add_argument('--IfExistContaminantProteins',
@@ -60,7 +60,7 @@ parser.add_argument('--IfExistContaminantProteins',
                     choices=('true','false'),
                     help='Set to true if input protein list contains contaminant proteins')
 parser.add_argument('--PrefixOfContaminantProtein',
-                    type=ascii,
+                    type=str,
                     default="CON_",
                     help='Prefix of contaminant protein')
 parser.add_argument('--IfCalculateiBAQ',
@@ -74,8 +74,8 @@ parser.add_argument('--IfCalculateTop3',
                     choices=('true','false'),
                     help='Calculate Top 3')
 parser.add_argument('--RegressionMethod',
-                    type=ascii,
-                    choices=["BART", "stepwise"],
+                    type=str,
+                    choices=['BART', 'stepwise'],
                     default="BART",
                     help='Regression method for Q-factor learning.')
 parser.add_argument('--alpha',
@@ -107,7 +107,7 @@ parser.add_argument('--PepLongestLen',
                     default=30,
                     help='The allowed longest length of a peptide in the theoretical digestion.')
 parser.add_argument('--Enzyme',
-                    type=ascii,
+                    type=str,
                     default="trypsin",
                     help='The enzyme used for theoretical digestion.')
 parser.add_argument('--IfCotainStandardProtein',
@@ -116,7 +116,7 @@ parser.add_argument('--IfCotainStandardProtein',
                     choices=('true','false'),
                     help='Does the sample contain standard proteins')
 parser.add_argument('--IdentifierOfStandardProtein',
-                    type=ascii,
+                    type=str,
                     default="ups",
                     help='If the sample contains proteins, identifier of standard proteins')
 parser.add_argument('--StandardProteinsFilePath',
@@ -129,14 +129,13 @@ args = parser.parse_args()
 print("Running LFAQ with the following parameters:")
 
 # create parameter file
+os.makedirs(args.ResultPath, exist_ok=True)
 parameter_file_name =  "parameters_" + str(datetime.datetime.now()).replace(" ","_").replace(":","").replace("-","").replace(".","_") + ".params"
 parameter_full_path = os.path.join(args.ResultPath, parameter_file_name)
 parameter_file = open(parameter_full_path, 'w')
 for arg in vars(args):
     parameter_name = arg.replace("_", " ")
     value = getattr(args,arg)
-    if isinstance(value, str):
-        value = value.replace("'","")
     if arg == "IdentifierParsingRule":
         value = value.replace("\\\\","\\")
     parameter_file.write("{0}=\"{1}\"\n".format(parameter_name,value))
