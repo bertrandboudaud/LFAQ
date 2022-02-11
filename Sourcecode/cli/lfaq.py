@@ -16,6 +16,7 @@ import argparse
 import pathlib
 import os
 import datetime
+import subprocess
 
 parser = argparse.ArgumentParser(description='LFAQ, a novel algorithm for label-free absolute protein quantification, which can correct the biased MS intensities using the predicted peptide quantitative factors for all identified peptides.')
 
@@ -33,7 +34,7 @@ parser.add_argument('--IdentificationFileType', type=ascii,
                     default="maxquant",
                     help='')
 parser.add_argument('--IdentifierParsingRule', type=ascii,
-                    default=">(.*?)\\s",
+                    default='>(.*?)\s',
                     help='')
 parser.add_argument('--IfExistDecoyProteins', action='store_false',
                     help='')
@@ -92,8 +93,8 @@ print("Running LFAQ with the following parameters:")
 
 # create parameter file
 parameter_file_name =  "parameters_" + str(datetime.datetime.now()).replace(" ","_").replace(":","").replace("-","").replace(".","_") + ".params"
-full_path = os.path.join(args.ResultPath, parameter_file_name)
-parameter_file = open(full_path, 'w')
+parameter_full_path = os.path.join(args.ResultPath, parameter_file_name)
+parameter_file = open(parameter_full_path, 'w')
 for arg in vars(args):
     parameter_name = arg.replace("_", " ")
     value = getattr(args,arg)
@@ -104,9 +105,23 @@ for arg in vars(args):
             value="false"
     if isinstance(value, str):
         value = value.replace("'","")
+    if arg == "IdentifierParsingRule":
+        value = value.replace("\\\\","\\")
     parameter_file.write("{0}=\"{1}\"\n".format(parameter_name,value))
     print("{0}=\"{1}\"".format(parameter_name,value))
 parameter_file.close()
-print("Parameters file created at {0}".format(full_path))
+print("Parameters file created at {0}".format(parameter_full_path))
 
-# launch
+# execute workflow
+executables_path = "C:\\Users\\bertr\\LFAQ\\ExecutableFiles\\x64\\"
+os.chdir(executables_path)
+
+# launch load.exe
+Load_exe_path = os.path.join(executables_path, "Load.exe")
+Load_exe_args = [Load_exe_path, parameter_full_path]
+subprocess.check_call(Load_exe_args)
+
+# launch ProteinAbsoluteQuan.exe
+ProteinAbsoluteQuan_exe_path = os.path.join(executables_path, "ProteinAbsoluteQuan.exe")
+ProteinAbsoluteQuan_exe_args = [ProteinAbsoluteQuan_exe_path, parameter_full_path]
+subprocess.check_call(ProteinAbsoluteQuan_exe_args)
