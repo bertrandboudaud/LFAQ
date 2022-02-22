@@ -41,9 +41,9 @@ parser.add_argument('ExecutablesPath',
 # optional arguments
 parser.add_argument('--IdentificationFileType',
                     type=str,
-                    choices=['maxquant', 'PeakView', 'mzQuantML'],
-                    default="maxquant",
-                    help='Software used to identify the proteins')
+                    choices=['detect', 'maxquant', 'PeakView', 'mzQuantML'],
+                    default="detect",
+                    help='Software used to identify the proteins. By default, deduced from the input file, but that option will force the type.')
 parser.add_argument('--IdentifierParsingRule',
                     type=str,
                     default='>(.*?)\s',
@@ -142,6 +142,17 @@ stepwise_group.add_argument('--alpha2',
                     help='The alpha2 should be a numerical number between 0 and 1.')
 
 args = parser.parse_args()
+
+# automativcally deduce IdentificationFileType from extension
+if args.IdentificationFileType == "detect":
+    input_filename, input_extension = os.path.splitext(args.Input)
+    print(input_extension)
+    if input_extension.lower() == ".mzq":
+        args.IdentificationFileType = "mzQuantML"
+    elif input_extension.lower() == ".csv":
+        args.IdentificationFileType = "PeakView"
+    else:
+        args.IdentificationFileType = "maxquant"
 
 # summary message
 print("Running LFAQ with the following parameters:")
